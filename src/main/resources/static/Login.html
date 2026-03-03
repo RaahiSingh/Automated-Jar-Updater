@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <style>
+    .password-wrapper {
+      position: relative;
+    }
+    .toggle-password {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      cursor: pointer;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-sm-6 col-sm-offset-3">
+      <h2>Login Form</h2>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="email">Username:</label>
+          <input type="text" class="form-control" id="email" name="username" placeholder="Enter username" required>
+        </div>
+        <div class="form-group password-wrapper">
+          <label for="pwd">Password:</label>
+          <input type="password" class="form-control" id="pwd" name="password" placeholder="Enter password" required>
+          <span class="glyphicon glyphicon-eye-open toggle-password" onclick="togglePassword()"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+      </form>
+
+      <div id="error" class="alert alert-danger" style="display:none;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Toggle password visibility
+  function togglePassword() {
+    const passwordInput = document.getElementById("pwd");
+    const icon = document.querySelector(".toggle-password");
+    if (passwordInput.type === "password") {
+      passwordInput.type = "text";
+      icon.classList.remove("glyphicon-eye-open");
+      icon.classList.add("glyphicon-eye-close");
+    } else {
+      passwordInput.type = "password";
+      icon.classList.remove("glyphicon-eye-close");
+      icon.classList.add("glyphicon-eye-open");
+    }
+  }
+
+  // Handle login form submission
+  document.getElementById("loginForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const username = document.getElementById("email").value;
+    const password = document.getElementById("pwd").value;
+
+    fetch("http://localhost:8081/auth/generateToken", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "text/plain"
+      },
+      body: JSON.stringify({ username: username, password: password })
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Login failed");
+      }
+      return response.text(); // if backend returns plain string (token)
+    })
+    .then(token => {
+      console.log("Token received:", token);
+
+      // Save token in localStorage
+      localStorage.setItem("token", token);
+
+      // Optional success flash
+      alert("✅ Logged in successfully!");
+
+      // Redirect to dashboard
+      window.location.href = "dashboard.html";
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      document.getElementById("error").innerText = "❌ Invalid username or password.";
+      document.getElementById("error").style.display = "block";
+    });
+  });
+</script>
+</body>
+</html>
