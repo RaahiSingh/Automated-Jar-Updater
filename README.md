@@ -1,6 +1,6 @@
 # Automated Jar Updater
 
-This Spring Boot project automates the management of JAR-based services.  
+This Spring Boot project built during internship automates the management of JAR-based services.  
 
 It allows users to:  
 - View running services and their statuses  
